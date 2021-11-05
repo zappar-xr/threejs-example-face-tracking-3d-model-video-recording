@@ -32,7 +32,7 @@
   "dependencies": {
     "@zappar/video-recorder": "^0.1.18",
     "@zappar/webgl-snapshot": "0.0.17",
-    "@zappar/zappar-threejs": "^0.3.31",
+    "@zappar/zappar-threejs": "^0.3.33",
     "three": "^0.126.1"
   }
 }
