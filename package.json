@@ -30,8 +30,8 @@
     "webpack-dev-server": "^3.11.2"
   },
   "dependencies": {
-    "@zappar/video-recorder": "^0.1.18",
-    "@zappar/webgl-snapshot": "0.0.17",
+    "@zappar/video-recorder": "^0.1.22",
+    "@zappar/webgl-snapshot": "^1.1.0",
     "@zappar/zappar-threejs": "^0.3.33",
     "three": "^0.126.1"
   }

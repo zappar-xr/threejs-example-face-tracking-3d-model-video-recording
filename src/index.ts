@@ -1,8 +1,8 @@
 /// Zappar for ThreeJS Examples
 /// Face Tracking 3D Model
 import * as ZapparVideoRecorder from '@zappar/video-recorder';
+import WebGlSnapshot from '@zappar/webgl-snapshot';
 // In this example we track a 3D model to the user's face
-
 import * as THREE from 'three';
 import * as ZapparThree from '@zappar/zappar-threejs';
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader';
@@ -120,15 +120,14 @@ async function initRecorder() {
     placeButton.innerText = 'TAP TO STOP RECORDING';
   });
 
-  // When stop recording update text,
-  // create a download url and click it
+  // When stop recording update text, and prompt a social share dialog.
   recorder.onComplete.bind(async (result) => {
     placeButton.innerText = 'TAP TO START RECORDING';
 
-    const a = document.createElement('a');
-    a.href = await result.asDataURL();
-    a.download = 'MyVid.mp4';
-    a.click();
+    WebGlSnapshot({
+      data: await result.asDataURL(),
+    });
+
     recording = false;
   });
 
