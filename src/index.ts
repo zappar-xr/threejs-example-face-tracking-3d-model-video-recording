@@ -6,8 +6,9 @@ import WebGlSnapshot from '@zappar/webgl-snapshot';
 import * as THREE from 'three';
 import * as ZapparThree from '@zappar/zappar-threejs';
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader';
-import helmet from '../assets/z_helmet.glb';
-import './index.sass';
+import './index.css';
+
+const helmet = new URL('../assets/z_helmet.glb', import.meta.url).href;
 
 // The SDK is supported on many different browsers, but there are some that
 // don't provide camera access. This function detects if the browser is supported
