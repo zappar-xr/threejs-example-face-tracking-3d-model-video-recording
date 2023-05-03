@@ -68,29 +68,48 @@ const faceTrackerGroup = new ZapparThree.FaceAnchorGroup(camera, faceTracker);
 // Add our face tracker group into the ThreeJS scene
 scene.add(faceTrackerGroup);
 
-// Start with the content group invisible
-faceTrackerGroup.visible = false;
+// // Start with the content group invisible
+// faceTrackerGroup.visible = false;
 
-// We want the user's face to appear in the center of the helmet
-// so use ZapparThree.HeadMaskMesh to mask out the back of the helmet.
-// In addition to constructing here we'll call mask.updateFromFaceAnchorGroup(...)
-// in the frame loop later.
-const mask = new ZapparThree.HeadMaskMeshLoader().load();
-faceTrackerGroup.add(mask);
+// // We want the user's face to appear in the center of the helmet
+// // so use ZapparThree.HeadMaskMesh to mask out the back of the helmet.
+// // In addition to constructing here we'll call mask.updateFromFaceAnchorGroup(...)
+// // in the frame loop later.
+// const mask = new ZapparThree.HeadMaskMeshLoader().load();
+// faceTrackerGroup.add(mask);
 
-// Load a 3D model to place within our group (using ThreeJS's GLTF loader)
+// // Load a 3D model to place within our group (using ThreeJS's GLTF loader)
+// // Pass our loading manager in to ensure the progress bar works correctly
+// const gltfLoader = new GLTFLoader(manager);
+// gltfLoader.load(helmet, (gltf) => {
+//   // Position the loaded content to overlay user's face
+//   gltf.scene.position.set(0.3, -1.3, 0);
+//   gltf.scene.scale.set(1.1, 1.1, 1.1);
+
+//   // Add the scene to the tracker group
+//   faceTrackerGroup.add(gltf.scene);
+// }, undefined, () => {
+//   console.log('An error ocurred loading the GLTF model');
+// });
+
+// Load the face mesh and create a THREE BufferGeometry from it
 // Pass our loading manager in to ensure the progress bar works correctly
-const gltfLoader = new GLTFLoader(manager);
-gltfLoader.load(helmet, (gltf) => {
-  // Position the loaded content to overlay user's face
-  gltf.scene.position.set(0.3, -1.3, 0);
-  gltf.scene.scale.set(1.1, 1.1, 1.1);
+const faceTextureTemplate = new URL('../assets/MIFaceMask.png', import.meta.url).href;
+const faceMesh = new ZapparThree.FaceMeshLoader(manager).load();
+const faceBufferGeometry = new ZapparThree.FaceBufferGeometry(faceMesh);
 
-  // Add the scene to the tracker group
-  faceTrackerGroup.add(gltf.scene);
-}, undefined, () => {
-  console.log('An error ocurred loading the GLTF model');
-});
+// Load the face template texture to render on the mesh
+// Pass our loading manager in to ensure the progress bar works correctly
+const textureLoader = new THREE.TextureLoader(manager);
+const faceTexture = textureLoader.load(faceTextureTemplate);
+
+faceTexture.flipY = false;
+
+// Construct a THREE Mesh object from our geometry and texture, and add it to our tracker group
+const faceMeshMesh = new THREE.Mesh(faceBufferGeometry, new THREE.MeshStandardMaterial({
+  map: faceTexture, transparent: true,
+}));
+faceTrackerGroup.add(faceMeshMesh);
 
 // Let's add some lighting, first a directional light above the model pointing down
 const directionalLight = new THREE.DirectionalLight('white', 0.8);
@@ -149,8 +168,10 @@ function render(): void {
   // The Zappar camera must have updateFrame called every frame
   camera.updateFrame(renderer);
 
-  // Update the head mask so it fits the user's head in this frame
-  mask.updateFromFaceAnchorGroup(faceTrackerGroup);
+  // Each frame, after camera.updateFrame we want to update the mesh geometry
+  // with the latest data from the face tracker
+  faceBufferGeometry.updateFromFaceAnchorGroup(faceTrackerGroup);
+
 
   // Draw the ThreeJS scene in the usual way, but using the Zappar camera
   renderer.render(scene, camera);
